@@ -1,0 +1,7 @@
+- name: Check if an administrator account exists
+  uri:
+    url: "{{ api_endpoint }}/users/admin/check"
+    method: GET
+    return_content: yes
+    status_code: [200, 204, 404, -1]
+  register: admin_exists

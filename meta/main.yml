@@ -1,0 +1,18 @@
+galaxy_info:
+  role_name: portainer_manager
+  author: Doc_Tiebeau
+  description: IT Architect
+  company: Frogz-Group
+
+  license: license (GPL-23)
+
+  min_ansible_version: 2.10.12
+
+  platforms:
+    - name: Debian,Redhat,Alpine
+
+  galaxy_tags:
+    - portainer
+    - docker
+
+dependencies: []

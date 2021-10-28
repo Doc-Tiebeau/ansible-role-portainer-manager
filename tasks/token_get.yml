@@ -1,0 +1,16 @@
+# Ansible set of task to get authenticate on a portainer
+---
+- name: Portainer get token
+  uri:
+    url: "{{ api_endpoint }}/auth"
+    method: POST
+    return_content: yes
+    body_format: json
+    body: |
+      {
+      'Username':"{{ hostvars[inventory_hostname].apps.docker.portainer.login | default ( 'admin' ) }}"
+      ,
+      'Password':"{{ hostvars[inventory_hostname].apps.docker.portainer.password | default ( 'Test1234' ) }}"
+      }
+    timeout: 60
+  register: auth_token

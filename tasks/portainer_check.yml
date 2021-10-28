@@ -1,0 +1,7 @@
+- name: Check portainer status
+  uri:
+    url: "{{ api_endpoint }}/status"
+    method: GET
+    return_content: yes
+    status_code: [200, 204, 404, -1]
+  register: portainer_status

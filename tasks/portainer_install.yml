@@ -1,0 +1,26 @@
+---
+    - name: Create docker_admin_network  
+      docker_network:
+        name: docker_admin_network
+        state: present
+
+    - name: Deploy portainer compose files
+      copy:
+        src: "files/portainer/docker-compose.yml"
+        dest: /opt/portainer/
+        force: no
+        owner: root
+        group: root
+        mode: 644
+        unsafe_writes: no
+
+    - name: Start Portainer
+      docker_compose:
+        project_src: /opt/portainer
+        files:
+        - docker-compose.yml
+        state: present
+        stopped: no
+        restarted: no
+        pull: no
+        recreate: smart #smart= on changes, #never, #always

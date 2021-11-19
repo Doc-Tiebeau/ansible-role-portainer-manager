@@ -55,11 +55,11 @@ Because Flatcar Container Linux is delivered on immutable file system, it needs 
 This section is adapted from [kubespray's flatcar bootstrap](https://github.com/kubernetes-sigs/kubespray/blob/6aac59394e5d2801e4dcde71c393b73201a880ef/roles/bootstrap-os/tasks/bootstrap-flatcar.yml).
 
 Following components are missing on Flatcar:
- - Python 3 (pypy v3.6 or later) (see [contrib/flatcar/bootstrap.sh](contrib/flatcar/bootstrap.sh))
+ - Python 3 (pypy v3.6 or later) (see [bootstrap.sh](contrib/flatcar/bootstrap.sh))
  - Python PiP ( see contrib playbook [bootstrap-flatcar.yml](contrib/flatcar/bootstrap-flatcar.yml))
  - Python-Docker (even if docker is already present in system see contrib playbook [docker-flatcar.yml](contrib/flatcar/docker-flatcar.yml))
    - Do not try to install pip using pypy on Flatcar, its fails.
- - Docker-Compose (2.1.1 or later) [see [contrib/flatcar/](contrib/flatcar/)]
+ - Docker-Compose (2.1.1 or later) (see contrib playbook [docker-flatcar.yml](contrib/flatcar/docker-flatcar.yml))
    - Need to be `/opt/bin/docker-compose`
 
 

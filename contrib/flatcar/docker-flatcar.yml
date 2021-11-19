@@ -1,0 +1,40 @@
+- name: Docker base configuration for Flatcar Linux
+  hosts: all
+  become: true
+  tasks:
+
+  - name: Force docker install using PiP for ansible compatibility
+    ansible.builtin.command: python -m pip install docker
+    args:
+      creates: /opt/bin/pypy3/site-packages/docker
+
+  - name: Check if docker-compose is installed
+    ansible.builtin.stat:
+      path: /opt/bin/docker-compose
+    register: compose_binary
+
+  - name: Check if docker-compose is installed
+    ansible.builtin.stat:
+      path: /opt/bin/docker-compose
+    register: compose_binary
+  
+  - name: Download and install docker-compose
+    ansible.builtin.get_url:
+      url: https://github.com/docker/compose/releases/download/v2.1.1/docker-compose-Linux-x86_64
+      dest: /opt/bin/docker-compose
+      owner: root
+      group: root
+      mode: '0755'
+    when: 
+      - compose_binary.stat.exists == false
+    become: true
+
+- name: Starting docker service
+  hosts: all
+  tasks:
+  - name: Start docker service
+    ansible.builtin.systemd:
+      name: docker
+      state: restarted
+      enabled: yes
+    become: true

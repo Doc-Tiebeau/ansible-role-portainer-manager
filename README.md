@@ -1,21 +1,31 @@
-ansible-role-portainer-manager
-=========
+# Portainer Manager
+
+- [Portainer Manager](#portainer-manager)
+- [Requirements](#requirements)
+- [Architectures:](#architectures)
+- [Role Variables](#role-variables)
+- [Dependencies](#dependencies)
+- [OS Bootstrap](#os-bootstrap)
+  - [Flatcar Container Linux](#flatcar-container-linux)
+- [Example Inventory](#example-inventory)
+- [Example Playbook](#example-playbook)
+- [License](#license)
+  - [Author Information](#author-information)
 
 Ansible-role-portainer-manager aims to deploy, configure and manage Portainer ecosystems.
 
-Requirements
-------------
+# Requirements
 
 This role requires:
- - Ansible version: 2.10.12
+ - Ansible minimum version: 2.10.12
  - Ansible inventory structure: YAML
  - Python Jmespath
    - ```
       pip install jmespath
       ```
 
-Architectures:
---------------
+# Architectures:
+
 Tested on:
 - Alpine Linux 3.14
 - Debian 10
@@ -23,13 +33,11 @@ Tested on:
 - RedHat 8
 - CentOS 8
 
-Role Variables
---------------
+# Role Variables
 
 See inventory
 
-Dependencies
-------------
+# Dependencies
 
 ```yaml
   - roles:
@@ -39,9 +47,26 @@ Dependencies
       version: <= 1.7.0
       source: https://galaxy.ansible.com
 ```
+# OS Bootstrap
+## Flatcar Container Linux
 
-Example Inventory
-----------------
+Because Flatcar Container Linux is delivered on immutable file system, it needs specific customization to work with ansible and wir portainer manager too.
+
+This section is adapted from [kubespray's flatcar bootstrap](https://github.com/kubernetes-sigs/kubespray/blob/6aac59394e5d2801e4dcde71c393b73201a880ef/roles/bootstrap-os/tasks/bootstrap-flatcar.yml).
+
+Following components are missing on Flatcar:
+ - Python 3 (pypy v3.6 or later) (see [contrib/flatcar/bootstrap.sh](contrib/flatcar/bootstrap.sh))
+ - Python PiP ( see contrib playbook [bootstrap-flatcar.yml](contrib/flatcar/bootstrap-flatcar.yml))
+ - Python-Docker (even if docker is already present in system see contrib playbook [docker-flatcar.yml](contrib/flatcar/docker-flatcar.yml))
+   - Do not try to install pip using pypy on Flatcar, its fails.
+ - Docker-Compose (2.1.1 or later) [see [contrib/flatcar/](contrib/flatcar/)]
+   - Need to be `/opt/bin/docker-compose`
+
+
+**Note**: Because of unexpected side effects locksmithd auto upgrade and reboot service is disabled at this time.
+
+# Example Inventory
+
 ```yaml
 all: # keys must be unique, i.e. only one 'hosts' per group
   hosts:
@@ -63,14 +88,13 @@ all: # keys must be unique, i.e. only one 'hosts' per group
                 EndpointCreationType: 1
                 URL: "unix:///var/run/docker.sock"
                 PublicURL: <IP|FQDN> # Optional but recommended to get shortcuts functional in portainer API
-              - Name: master01 # remote server which docker API has been opened
+              - Name: slave<NN> # remote server which docker API has been opened
                 EndpointCreationType: 1
                 URL: "tcp://<IP|FQDN>:<port>" # default tcp port is 2375
                 PublicURL: <IP|FQDN> # Optional but recommended
 ```
 
-Example Playbook
-----------------
+# Example Playbook
 
 After formating and populating your **YAML** inventory add following inside your playbook.
 
@@ -80,8 +104,7 @@ After formating and populating your **YAML** inventory add following inside your
       when: hostvars[inventory_hostname].apps.docker.portainer is defined
 ```
 
-License
--------
+# License
 
 GNU GPL-V3  
 Free of use, modify and redistribute.
@@ -93,4 +116,4 @@ Should probably comes in CC BY-SA for future versions.
 Author Information
 ------------------
 
-Jack of all trades master of none
+Jack of all trades master of none.

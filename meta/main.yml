@@ -9,10 +9,11 @@ galaxy_info:
   min_ansible_version: 2.10.12
 
   platforms:
-    - name: Debian,Redhat,Alpine
+    - name: Debian,Redhat,Alpine,Flatcar
 
   galaxy_tags:
     - portainer
     - docker
+    - flatcar
 
 dependencies: []

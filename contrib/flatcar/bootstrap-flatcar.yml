@@ -33,7 +33,7 @@
     creates: /opt/bin/pypy3/site-packages/pip
 
 - name: Upgrade Python PiP
-  ansible.builtin.command: python -m install --upgrade pip
+  ansible.builtin.command: python -m pip install --upgrade pip
 
 - name: Disable auto-upgrade
   systemd:

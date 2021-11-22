@@ -14,8 +14,6 @@
         mode: 644
         unsafe_writes: no
 
-    - name: Start Portainer
-      docker_compose:
     - name: Start Portainer for "legacy linux"
       community.docker.docker_compose:
         project_src: /opt/portainer

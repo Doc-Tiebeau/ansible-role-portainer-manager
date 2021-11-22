@@ -1,11 +1,11 @@
 ---
     - name: Create docker_admin_network  
-      docker_network:
+      community.docker.docker_network:
         name: docker_admin_network
         state: present
 
     - name: Deploy portainer compose files
-      copy:
+      ansible.builtin.copy:
         src: "files/portainer/docker-compose.yml"
         dest: /opt/portainer/
         force: no
@@ -16,6 +16,8 @@
 
     - name: Start Portainer
       docker_compose:
+    - name: Start Portainer for "legacy linux"
+      community.docker.docker_compose:
         project_src: /opt/portainer
         files:
         - docker-compose.yml
@@ -24,3 +26,20 @@
         restarted: no
         pull: no
         recreate: smart #smart= on changes, #never, #always
+      when:
+        - ansible_facts['distribution'] == "RedHat"
+          or
+          ansible_facts['distribution'] == "CentOS"
+          or
+          ansible_facts['distribution'] == "Debian"
+          or
+          ansible_facts['distribution'] == "Ubuntu"
+        - hostvars[inventory_hostname].apps.docker.portainer is defined
+
+    - name: Start Portainer for "Flatcar Linux"
+      ansible.builtin.command:
+        chdir: /opt/portainer
+        cmd: docker-compose up -d
+      when:
+        - ansible_facts['distribution'] == "Flatcar"
+        - hostvars[inventory_hostname].apps.docker.portainer is defined

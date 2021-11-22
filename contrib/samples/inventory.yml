@@ -17,7 +17,7 @@ all: # keys must be unique, i.e. only one 'hosts' per group
                 EndpointCreationType: 1
                 URL: "unix:///var/run/docker.sock"
                 PublicURL: <IP|FQDN> # Optional but recommended to get shortcuts functional in portainer API
-              - Name: slave01 # remote server which docker API has been opened
+              - Name: slave<NN> # remote server which docker API has been opened
                 EndpointCreationType: 1
                 URL: "tcp://<IP|FQDN>:<port>" # default tcp port is 2375
                 PublicURL: <IP|FQDN> # Optional but recommended 

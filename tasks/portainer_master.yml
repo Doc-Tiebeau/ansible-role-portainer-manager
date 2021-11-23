@@ -75,13 +75,3 @@
   when:
     - hostvars[inventory_hostname].apps.docker.portainer.endpoints is defined
     - '"docker-slave" in endpoints_type_list'
-
-- name: List existing stacks
-  include_tasks: stacks_list.yml
-
-# - name: "Print missing stacks"
-#   debug:
-#     msg: "{{ stacks_missing }}"
-
-- name: Deploy stacks
-  include_tasks: stacks_deploy.yml

@@ -12,11 +12,6 @@
     ansible.builtin.stat:
       path: /opt/bin/docker-compose
     register: compose_binary
-
-  - name: Check if docker-compose is installed
-    ansible.builtin.stat:
-      path: /opt/bin/docker-compose
-    register: compose_binary
   
   - name: Download and install docker-compose
     ansible.builtin.get_url:

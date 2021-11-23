@@ -1,0 +1,49 @@
+---
+- name: Register new SLAVE TCP endpoints
+  uri:
+    url: "{{ api_endpoint }}/endpoints"
+    method: POST
+    return_content: yes
+    body_format: form-multipart
+    headers:
+      accept: application/json
+      Content-Type: multipart/form-data
+      Authorization: "Bearer {{ (auth_token.content|from_json).jwt }}"
+    body:
+      Name: "{{ item.Name }}"
+      EndpointCreationType: "{{ item.EndpointCreationType }}"
+      URL: "{{ item.URL | string }}"
+      PublicURL: "{{ item.PublicURL | default(omit, true) }}"
+  with_items:
+    - "{{ hostvars[inventory_hostname].apps.docker.portainer.endpoints}}"
+  when:
+    - item.Type == "docker-slave"
+    - item.EndpointCreationType == 1
+    - item.Name not in {{ endpoints.json | json_query('[*].Name') | flatten }}
+    - item.URL not in {{ endpoints.json | json_query('[*].URL') | flatten }}
+
+- name: Register new SLAVE Portainer Agent endpoints
+  uri:
+    url: "{{ api_endpoint }}/endpoints"
+    method: POST
+    return_content: yes
+    body_format: form-multipart
+    headers:
+      accept: application/json
+      Content-Type: multipart/form-data
+      Authorization: "Bearer {{ (auth_token.content|from_json).jwt }}"
+    body:
+      Name: "{{ item.Name }}"
+      EndpointCreationType: "{{ item.EndpointCreationType }}"
+      URL: "{{ item.URL | string }}"
+      PublicURL: "{{ item.PublicURL | default(omit, true) }}"
+      TLS: "true"
+      TLSSkipVerify: "true"
+      TLSSkipClientVerify: "true"
+  with_items:
+    - "{{ hostvars[inventory_hostname].apps.docker.portainer.endpoints}}"
+  when:
+    - item.Type == "docker-slave"
+    - item.EndpointCreationType == 2
+    - item.Name not in {{ endpoints.json | json_query('[*].Name') | flatten }}
+    - item.URL not in {{ endpoints.json | json_query('[*].URL') | flatten }}

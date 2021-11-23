@@ -8,18 +8,32 @@ all: # keys must be unique, i.e. only one 'hosts' per group
       apps:
         docker: # Optional: activates installation without confirmation
           portainer:
+            version: 2.9.3 # MANDATORY: digits only
+            type: master # MANDATORY: master or docker-slave (portainer_agent)
             address: <IP|FQDN> # Optional: Portainer URL without <http://> and <port>; default <ansible_host>
             port: <digit> # Optional: default 9000
             login: <portainer_admin_login> ## Optional: default: admin
             password: <pportaine_admin_password> #default: Test1234
             endpoints: # Optional: Register endpoints after portainer installation
-              - Name: local # local server where portainer has been deployed
+              - Name: master01 # local server where portainer has been deployed
+                Type: master # MANDATORY: master or docker-slave (portainer_agent)
                 EndpointCreationType: 1
                 URL: "unix:///var/run/docker.sock"
                 PublicURL: <IP|FQDN> # Optional but recommended to get shortcuts functional in portainer API
               - Name: slave<NN> # remote server which docker API has been opened
+                Type: docker-slave # MANDATORY: master or docker-slave (portainer_agent)
                 EndpointCreationType: 1
                 URL: "tcp://<IP|FQDN>:<port>" # default tcp port is 2375
                 PublicURL: <IP|FQDN> # Optional but recommended 
-
+    node02:
+      ansible_host: <master_IP|FQDN>
+      ansible_user: <ssh_login>
+      ansible_ssh_pass: <ssh_password>
+      # ansible_ssh_args: '-o StrictHostKeyChecking=no' # Uncomment this line to bypass prompt for ssh key validation, use at your own risk !!!
+      apps:
+        docker: # Optional: activates installation without confirmation
+          portainer:
+            version: 2.9.3 # MANDATORY: digits only
+            type: docker-slave # MANDATORY: master or docker-slave (portainer_agent)
+            mode: portainer_agent # MANDATORY: only portanier_agent supported at this time
 

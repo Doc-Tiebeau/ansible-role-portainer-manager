@@ -1,17 +1,22 @@
 ---
-    - name: Create docker_admin_network  
-      community.docker.docker_network:
-        name: docker_admin_network
-        state: present
-
-    - name: Deploy portainer compose files
-      ansible.builtin.copy:
-        src: "files/portainer/docker-compose.yml"
+    - name: Create portainer install directory
+      ansible.builtin.file:
         dest: /opt/portainer/
         force: no
         owner: root
         group: root
-        mode: 644
+        mode: 0600
+        state: directory
+        unsafe_writes: no
+
+    - name: Deploy portainer compose files
+      ansible.builtin.template:
+        src: files/portainer/docker-compose.j2
+        dest: /opt/portainer/docker-compose.yml
+        force: no
+        owner: root
+        group: root
+        mode: 0600
         unsafe_writes: no
 
     - name: Start Portainer for "legacy linux"
@@ -33,6 +38,7 @@
           or
           ansible_facts['distribution'] == "Ubuntu"
         - hostvars[inventory_hostname].apps.docker.portainer is defined
+        - hostvars[inventory_hostname].apps.docker.portainer.type == "master"
 
     - name: Start Portainer for "Flatcar Linux"
       ansible.builtin.command:
@@ -41,3 +47,4 @@
       when:
         - ansible_facts['distribution'] == "Flatcar"
         - hostvars[inventory_hostname].apps.docker.portainer is defined
+        - hostvars[inventory_hostname].apps.docker.portainer.type == "master"

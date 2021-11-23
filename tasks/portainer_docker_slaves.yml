@@ -1,0 +1,22 @@
+---
+- name: Deploy portainer agent on docker-slave
+  community.docker.docker_container:
+    name: portainer_agent
+    image: portainer/agent:{{ hostvars[inventory_hostname].apps.docker.portainer.version }}
+    state: started
+    recreate: no
+    restart_policy: always
+    ports:
+      - 9001:9001
+    mounts:
+      - source: /var/run/docker.sock
+        target: /var/run/docker.sock
+        type: bind
+      - source: /var/lib/docker/volumes
+        target: /var/lib/docker/volumes
+        type: bind
+  when:
+    - hostvars[inventory_hostname].apps.docker.portainer is defined
+    - hostvars[inventory_hostname].apps.docker.portainer.type is defined
+    - hostvars[inventory_hostname].apps.docker.portainer.type == "docker-slave"
+    - hostvars[inventory_hostname].apps.docker.portainer.mode == "portainer_agent"

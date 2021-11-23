@@ -1,0 +1,77 @@
+---
+# tasks file for ansible-role-portainer-manager
+- name: Store api endpoint
+  set_fact:
+    api_endpoint: "http://{{ hostvars[inventory_hostname].apps.docker.portainer.address | default ( hostvars[inventory_hostname].ansible_host ) }}:{{ hostvars[inventory_hostname].apps.docker.portainer.port | default ( 9000 ) }}/api"
+
+- include_tasks: portainer_check.yml
+
+
+- name: Install Portainer
+  block:
+    - name: Portainer Installation
+      include_tasks: portainer_install.yml
+
+    - name: Waiting for Portainer goes up and running
+      uri:
+        url: "{{ api_endpoint }}/status"
+        method: GET
+        return_content: yes
+        status_code: [200, 204, 404, -1]
+      register: result
+      until: result.status in [200,204]
+      retries: 12
+      delay: 10
+
+    - include_tasks: portainer_check.yml
+
+  when:
+    - portainer_status.status == -1
+
+- name: Admin check
+  include_tasks: admin_check.yml
+
+- name: Configure Administrator account
+  block:
+    - name: Create Administrator account
+      uri:
+        url: "{{ api_endpoint }}/users/admin/init"
+        method: POST
+        return_content: yes
+        body_format: json
+        body: |
+          {
+          'Username':"{{ hostvars[inventory_hostname].apps.docker.portainer.login | default ( 'admin' ) }}"
+          ,
+          'Password':"{{ hostvars[inventory_hostname].apps.docker.portainer.password | default ( 'Test1234' ) }}"
+          }
+  when:
+    - portainer_status.status == 200
+    - admin_exists.status == 404
+
+- name: Update Admin check
+  include_tasks: admin_check.yml
+
+- name: Get Administrator authentication token
+  include_tasks: token_get.yml
+
+- name: Get endpoints list
+  include_tasks: endpoint_list.yml
+
+
+- name: Register endpoint's type list
+  ansible.builtin.set_fact:
+    endpoints_type_list: "{{ hostvars[inventory_hostname].apps.docker.portainer.endpoints | map(attribute='Type' ) }}"
+
+- name: Register new MASTER endpoints
+  ansible.builtin.include_tasks: endpoint_add_portainer_masters.yml
+  when:
+    - hostvars[inventory_hostname].apps.docker.portainer.endpoints is defined
+    - '"master" in endpoints_type_list'
+
+---
+- name: Register new SLAVE endpoints
+  ansible.builtin.include_tasks: endpoint_add_portainer_docker_slaves.yml
+  when:
+    - hostvars[inventory_hostname].apps.docker.portainer.endpoints is defined
+    - '"docker-slave" in endpoints_type_list'

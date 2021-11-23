@@ -1,105 +1,16 @@
 ---
-# tasks file for ansible-role-portainer-manager
-- name: Store api endpoint
-  set_fact:
-    api_endpoint: "http://{{ hostvars[inventory_hostname].apps.docker.portainer.address | default ( hostvars[inventory_hostname].ansible_host ) }}:{{ hostvars[inventory_hostname].apps.docker.portainer.port | default ( 9000 ) }}/api"
 
-- include_tasks: portainer_check.yml
-
-
-- name: Install Portainer
-  block:
-    - name: Portainer Installation
-      include_tasks: portainer_install.yml
-
-    - name: Waiting for Portainer goes up and running
-      uri:
-        url: "{{ api_endpoint }}/status"
-        method: GET
-        return_content: yes
-        status_code: [200, 204, 404, -1]
-      register: result
-      until: result.status in [200,204]
-      retries: 12
-      delay: 10
-
-    - include_tasks: portainer_check.yml
-
+---
+- name: Portainer Docker-Slaves
+  ansible.builtin.include_tasks: portainer_docker_slaves.yml
   when:
-    - portainer_status.status == -1
+    - hostvars[inventory_hostname].apps.docker.portainer is defined
+    - hostvars[inventory_hostname].apps.docker.portainer.type is defined
+    - hostvars[inventory_hostname].apps.docker.portainer.type == "docker-slave"
 
-- name: Admin check
-  include_tasks: admin_check.yml
-
-- name: Configure Administrator account
-  block:
-    - name: Create Administrator account
-      uri:
-        url: "{{ api_endpoint }}/users/admin/init"
-        method: POST
-        return_content: yes
-        body_format: json
-        body: |
-          {
-          'Username':"{{ hostvars[inventory_hostname].apps.docker.portainer.login | default ( 'admin' ) }}"
-          ,
-          'Password':"{{ hostvars[inventory_hostname].apps.docker.portainer.password | default ( 'Test1234' ) }}"
-          }
+- name: Portainer MASTER
+  ansible.builtin.include_tasks: portainer_master.yml
   when:
-    - portainer_status.status == 200
-    - admin_exists.status == 404
-
-- name: Update Admin check
-  include_tasks: admin_check.yml
-
-- name: Get Administrator authentication token
-  include_tasks: token_get.yml
-
-
-- name: List endpoints
-  uri:
-    url: "{{ api_endpoint }}/endpoints"
-    method: GET
-    return_content: yes
-    headers:
-      Authorization: "{{ (auth_token.content|from_json).jwt }}"
-    body_format: json
-  register: endpoints
-
-# - name: "DEBUG: endpoints RAW"
-#   debug:
-#     msg: "{{ endpoints.json }}"
-    
-# - name: "DEBUG: endpoints list"
-#   debug:
-#     msg: "{{ endpoints.json | json_query('[*].[Name, URL]') | flatten }}"
-
-- name: "Print existing endpoints"
-  debug:
-    msg: "Endpoint {{ item.Name }}:{{ item.URL }} already exists"
-  with_items:
-    - "{{ hostvars[inventory_hostname].apps.docker.portainer.endpoints }}"
-  when:
-    - item.Name in {{ endpoints.json | json_query('[*].Name') | flatten }}
-    - item.URL in {{ endpoints.json | json_query('[*].URL') | flatten }}
-
-- name: Register new endpoints
-  uri:
-    url: "{{ api_endpoint }}/endpoints"
-    method: POST
-    return_content: yes
-    body_format: form-multipart
-    headers:
-      accept: application/json
-      Content-Type: multipart/form-data
-      Authorization: "Bearer {{ (auth_token.content|from_json).jwt }}"
-    body:
-      Name: "{{ item.Name }}"
-      EndpointCreationType: "{{ item.EndpointCreationType }}"
-      URL: "{{ item.URL | string }}"
-      PublicURL: "{{ item.PublicURL | default(omit, true) }}"
-  with_items:
-    - "{{ hostvars[inventory_hostname].apps.docker.portainer.endpoints}}"
-  when:
-    - item.Name not in {{ endpoints.json | json_query('[*].Name') | flatten }}
-    - item.URL not in {{ endpoints.json | json_query('[*].URL') | flatten }}
+    - hostvars[inventory_hostname].apps.docker.portainer is defined
+    - hostvars[inventory_hostname].apps.docker.portainer.type is defined
+    - hostvars[inventory_hostname].apps.docker.portainer.type == "master"

@@ -69,7 +69,6 @@
     - hostvars[inventory_hostname].apps.docker.portainer.endpoints is defined
     - '"master" in endpoints_type_list'
 
----
 - name: Register new SLAVE endpoints
   ansible.builtin.include_tasks: endpoint_add_portainer_docker_slaves.yml
   when:

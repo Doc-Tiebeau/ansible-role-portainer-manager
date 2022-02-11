@@ -27,7 +27,7 @@ This role requires:
 # Architectures:
 
 Tested on:
-- Alpine Linux 3.14
+- Alpine Linux 3.15
 - Debian 10
 - Ubuntu 20.04
 - RedHat 8
@@ -83,7 +83,7 @@ all: # keys must be unique, i.e. only one 'hosts' per group
             address: <IP|FQDN> # Optional: Portainer URL without <http://> and <port>; default <ansible_host>
             port: <digit> # Optional: default 9000
             login: <portainer_admin_login> ## Optional: default: admin
-            password: <pportaine_admin_password> #default: Test1234
+            password: <portainer_admin_password> #default: Test1234
             endpoints: # Optional: Register endpoints after portainer installation
               - Name: master01 # local server where portainer has been deployed
                 Type: master # MANDATORY: master or docker-slave (portainer_agent)

@@ -37,6 +37,8 @@
           ansible_facts['distribution'] == "Debian"
           or
           ansible_facts['distribution'] == "Ubuntu"
+          or
+          ansible_facts['distribution'] == "Alpine"
         - hostvars[inventory_hostname].apps.docker.portainer is defined
         - hostvars[inventory_hostname].apps.docker.portainer.type == "master"
 

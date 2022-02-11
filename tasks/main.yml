@@ -1,6 +1,4 @@
 ---
-
----
 - name: Portainer Docker-Slaves
   ansible.builtin.include_tasks: portainer_docker_slaves.yml
   when:

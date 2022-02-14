@@ -18,5 +18,5 @@
   when:
     - hostvars[inventory_hostname].apps.docker.portainer is defined
     - hostvars[inventory_hostname].apps.docker.portainer.type is defined
-    - hostvars[inventory_hostname].apps.docker.portainer.type == "docker-slave"
+    - hostvars[inventory_hostname].apps.docker.portainer.type == "slave"
     - hostvars[inventory_hostname].apps.docker.portainer.mode == "portainer_agent"

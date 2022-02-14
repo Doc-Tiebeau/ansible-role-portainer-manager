@@ -17,7 +17,7 @@
   with_items:
     - "{{ hostvars[inventory_hostname].apps.docker.portainer.endpoints}}"
   when:
-    - item.Type == "docker-slave"
+    - item.Type == "slave"
     - item.EndpointCreationType == 1
     - item.Name not in {{ endpoints.json | json_query('[*].Name') | flatten }}
     - item.URL not in {{ endpoints.json | json_query('[*].URL') | flatten }}
@@ -43,7 +43,7 @@
   with_items:
     - "{{ hostvars[inventory_hostname].apps.docker.portainer.endpoints}}"
   when:
-    - item.Type == "docker-slave"
+    - item.Type == "slave"
     - item.EndpointCreationType == 2
     - item.Name not in {{ endpoints.json | json_query('[*].Name') | flatten }}
     - item.URL not in {{ endpoints.json | json_query('[*].URL') | flatten }}

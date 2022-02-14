@@ -73,4 +73,4 @@
   ansible.builtin.include_tasks: endpoint_add_portainer_docker_slaves.yml
   when:
     - hostvars[inventory_hostname].apps.docker.portainer.endpoints is defined
-    - '"docker-slave" in endpoints_type_list'
+    - '"slave" in endpoints_type_list'

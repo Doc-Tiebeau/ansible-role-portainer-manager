@@ -6,6 +6,7 @@
     state: started
     recreate: no
     restart_policy: always
+    container_default_behavior: compatibility
     ports:
       - 9001:9001
     mounts:

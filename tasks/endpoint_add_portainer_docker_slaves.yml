@@ -22,7 +22,7 @@
     - item.Name not in {{ endpoints.json | json_query('[*].Name') | flatten }}
     - item.URL not in {{ endpoints.json | json_query('[*].URL') | flatten }}
 
-- name: Register new SLAVE Portainer Agent endpoints
+- name: Register new SLAVE Portainer-Agent endpoints
   uri:
     url: "{{ api_endpoint }}/endpoints"
     method: POST

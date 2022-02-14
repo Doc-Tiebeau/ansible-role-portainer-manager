@@ -1,0 +1,13 @@
+- name: Get endpoint attributes
+  uri:
+    url: "{{ api_endpoint }}/endpoints"
+    method: GET
+    return_content: yes
+    body_format: form-multipart
+    headers:
+      accept: application/json
+      Content-Type: multipart/form-data
+      Authorization: "Bearer {{ (auth_token.content|from_json).jwt }}"
+    body: 
+      search: "{{ endpoint.Name }}"
+  register: endpoint

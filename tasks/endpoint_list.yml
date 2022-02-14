@@ -1,0 +1,10 @@
+---
+- name: List endpoints
+  uri:
+    url: "{{ api_endpoint }}/endpoints"
+    method: GET
+    return_content: yes
+    headers:
+      Authorization: "{{ (auth_token.content|from_json).jwt }}"
+    body_format: json
+  register: endpoints
